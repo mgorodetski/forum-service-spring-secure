@@ -4,6 +4,8 @@ import java.security.Principal;
 import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,28 +36,20 @@ public class UserAccountController {
 	public UserAccountDto registerUser(@RequestBody NewUserDto newUserDto) {
 		return userService.addUser(newUserDto);
 	}
-
-//	@PostMapping("/login")
-//	public UserAccountDto loginUser(@RequestHeader("Authorization") String token) { //, @RequestBody LoginUserDto loginUserDto) {
-//		//String[] arr = token.split(" ");
-//		token = token.split(" ")[1];
-//		byte[] bytesDecode = Base64.getDecoder().decode(token); 
-//		token = new String(bytesDecode);
-//		String[] credentials = token.split(":");
-//		return userService.getUser(credentials[0]);
-//	}
 	
 	@PostMapping("/login")
-	public UserAccountDto loginUser(Principal principal) { 
+	public UserAccountDto loginUser(Authentication principal) { 
 		return userService.getUser(principal.getName());
 	}
 
 	@DeleteMapping("/user/{login}")
+	//@PreAuthorize("#login == authentication.name or hasRole('ADMINISTRATOR')")
 	public UserAccountDto deleteUser(@PathVariable String login) {
 		return userService.removeUser(login);
 	}
 
 	@PutMapping("/user/{login}")
+	//@PreAuthorize("#login == authentication.name")
 	public UserAccountDto updateUser(@PathVariable String login, @RequestBody UpdateUserDto updateUserDto) {
 		return userService.editUser(login, updateUserDto);
 	}
